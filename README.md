@@ -11,6 +11,5 @@ Plan - I have a plan for this project, The first thing IM going to do is set up 
 
 ## Project Wireframe
 
-TODO: Replace the wireframe below with you own design.
+<img width="893" height="497" alt="image" src="https://github.com/user-attachments/assets/eed317a7-ae8e-45cd-b4d5-3998556c17ab" />
 
-![wireframe](wireframe-example.png)
