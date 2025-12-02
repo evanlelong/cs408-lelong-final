@@ -1,18 +1,95 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 
 <head>
-  <meta charset="utf-8">
-  <title>Hello World!</title>
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="css/style.css">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>My Cookbook</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
-  <h1>HTML Rocks!</h1>
-  <img src="img/compile.jpeg">
-  <script type="module" src="js/main.js"></script>
+    <h1>My Cookbook</h1>
+    
+    <nav>
+        <a href="index.html">Home</a> | 
+        <a href="add-recipe.html">Add Recipe</a> | 
+        <a href="browse.html">Browse</a>
+    </nav>
+
+    <hr>
+
+    <div>
+        <h2>All Recipes</h2>
+        <input type="text" id="search-input" placeholder="Search recipes...">
+        <button onclick="searchRecipes()">Search</button>
+        <button onclick="loadRecipes()">Show All</button>
+    </div>
+
+    <hr>
+
+    <div id="recipes-list">
+        <!-- Recipes will be loaded here -->
+    </div>
+
+    <script>
+        const API_URL = "https://51ymz2ea4c.execute-api.us-east-2.amazonaws.com";
+
+        function loadRecipes() {
+            let xhr = new XMLHttpRequest();
+            xhr.addEventListener("load", function () {
+                const data = JSON.parse(xhr.response);
+                displayRecipes(data.recipes);
+            });
+            xhr.open("GET", API_URL + "/recipes");
+            xhr.send();
+        }
+
+        function displayRecipes(recipes) {
+            const container = document.getElementById('recipes-list');
+            
+            if (!recipes || recipes.length === 0) {
+                container.innerHTML = '<p>No recipes found. <a href="add-recipe.html">Add your first recipe!</a></p>';
+                return;
+            }
+            
+            let html = '';
+            recipes.forEach(recipe => {
+                html += `
+                    <div style="border: 1px solid #ccc; padding: 15px; margin: 10px 0;">
+                        <h3>${recipe.name}</h3>
+                        <p>${recipe.description}</p>
+                        <p><strong>Category:</strong> ${recipe.category} | <strong>Difficulty:</strong> ${recipe.difficulty}</p>
+                        <p><strong>Prep Time:</strong> ${recipe.prepTime} min | <strong>Cook Time:</strong> ${recipe.cookTime} min</p>
+                        <a href="recipe-detail.html?id=${recipe.id}">View Details</a>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function searchRecipes() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            
+            let xhr = new XMLHttpRequest();
+            xhr.addEventListener("load", function () {
+                const data = JSON.parse(xhr.response);
+                const filtered = data.recipes.filter(recipe => 
+                    recipe.name.toLowerCase().includes(searchTerm) ||
+                    recipe.description.toLowerCase().includes(searchTerm) ||
+                    recipe.category.toLowerCase().includes(searchTerm)
+                );
+                displayRecipes(filtered);
+            });
+            xhr.open("GET", API_URL + "/recipes");
+            xhr.send();
+        }
+
+        // Load recipes when the page loads
+        window.onload = loadRecipes;
+    </script>
 </body>
 
 </html>

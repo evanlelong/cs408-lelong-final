@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Browse Recipes - My Cookbook</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <h1>Browse Recipes</h1>
+    
+    <nav>
+        <a href="index.html">Home</a> | 
+        <a href="add-recipe.html">Add Recipe</a> | 
+        <a href="browse.html">Browse</a>
+    </nav>
+
+    <hr>
+
+    <div>
+        <h2>Filter Recipes</h2>
+        
+        <label>Category:</label><br>
+        <select id="filter-category">
+            <option value="">All</option>
+            <option value="breakfast">Breakfast</option>
+            <option value="lunch">Lunch</option>
+            <option value="dinner">Dinner</option>
+            <option value="dessert">Dessert</option>
+            <option value="snack">Snack</option>
+            <option value="appetizer">Appetizer</option>
+        </select>
+        <br><br>
+        
+        <label>Difficulty:</label><br>
+        <select id="filter-difficulty">
+            <option value="">All</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+        <br><br>
+        
+        <label>Max Cook Time (minutes):</label><br>
+        <input type="number" id="filter-cooktime" min="0" placeholder="e.g., 30">
+        <br><br>
+        
+        <button onclick="applyFilters()">Apply Filters</button>
+        <button onclick="clearFilters()">Clear Filters</button>
+    </div>
+
+    <hr>
+
+    <div id="filtered-recipes">
+        <!-- Filtered recipes will be loaded here -->
+    </div>
+
+    <script>
+        const API_URL = "https://51ymz2ea4c.execute-api.us-east-2.amazonaws.com";
+
+        function applyFilters() {
+            const category = document.getElementById('filter-category').value;
+            const difficulty = document.getElementById('filter-difficulty').value;
+            const maxCookTime = document.getElementById('filter-cooktime').value;
+            
+            let url = API_URL + "/recipes/filter?";
+            let params = [];
+            
+            if (category) params.push("category=" + category);
+            if (difficulty) params.push("difficulty=" + difficulty);
+            if (maxCookTime) params.push("maxCookTime=" + maxCookTime);
+            
+            if (params.length === 0) {
+                loadAllRecipes();
+                return;
+            }
+            
+            url += params.join("&");
+
+            let xhr = new XMLHttpRequest();
+            xhr.addEventListener("load", function () {
+                const data = JSON.parse(xhr.response);
+                displayRecipes(data.recipes, data.count);
+            });
+            xhr.open("GET", url);
+            xhr.send();
+        }
+
+        function loadAllRecipes() {
+            let xhr = new XMLHttpRequest();
+            xhr.addEventListener("load", function () {
+                const data = JSON.parse(xhr.response);
+                displayRecipes(data.recipes, data.count);
+            });
+            xhr.open("GET", API_URL + "/recipes");
+            xhr.send();
+        }
+
+        function displayRecipes(recipes, count) {
+            const container = document.getElementById('filtered-recipes');
+            
+            if (!recipes || recipes.length === 0) {
+                container.innerHTML = '<p>No recipes found matching your filters.</p>';
+                return;
+            }
+            
+            let html = `<p><strong>Found ${count} recipe(s)</strong></p>`;
+            
+            recipes.forEach(recipe => {
+                html += `
+                    <div style="border: 1px solid #ccc; padding: 15px; margin: 10px 0;">
+                        <h3>${recipe.name}</h3>
+                        <p>${recipe.description}</p>
+                        <p><strong>Category:</strong> ${recipe.category} | <strong>Difficulty:</strong> ${recipe.difficulty}</p>
+                        <p><strong>Prep Time:</strong> ${recipe.prepTime} min | <strong>Cook Time:</strong> ${recipe.cookTime} min</p>
+                        <a href="recipe-detail.html?id=${recipe.id}">View Details</a>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function clearFilters() {
+            document.getElementById('filter-category').value = '';
+            document.getElementById('filter-difficulty').value = '';
+            document.getElementById('filter-cooktime').value = '';
+            loadAllRecipes();
+        }
+
+        // Load all recipes when the page loads
+        window.onload = loadAllRecipes;
+    </script>
+</body>
+
+</html>

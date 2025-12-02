@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Recipe Details - My Cookbook</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <h1>Recipe Details</h1>
+    
+    <nav>
+        <a href="index.html">Home</a> | 
+        <a href="add-recipe.html">Add Recipe</a> | 
+        <a href="browse.html">Browse</a>
+    </nav>
+
+    <hr>
+
+    <div id="recipe-details">
+        <!-- Recipe details will be loaded here -->
+    </div>
+
+    <script>
+        const API_URL = "https://51ymz2ea4c.execute-api.us-east-2.amazonaws.com";
+
+        function getRecipeId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        function loadRecipe() {
+            const recipeId = getRecipeId();
+            
+            if (!recipeId) {
+                document.getElementById('recipe-details').innerHTML = '<p>No recipe ID provided. <a href="index.html">Go back home</a></p>';
+                return;
+            }
+
+            let xhr = new XMLHttpRequest();
+            xhr.addEventListener("load", function () {
+                const recipe = JSON.parse(xhr.response);
+                displayRecipe(recipe);
+            });
+            xhr.open("GET", API_URL + "/recipes/" + recipeId);
+            xhr.send();
+        }
+
+        function displayRecipe(recipe) {
+            let html = `
+                <h2>${recipe.name}</h2>
+                <p>${recipe.description}</p>
+                <p><strong>Category:</strong> ${recipe.category}</p>
+                <p><strong>Difficulty:</strong> ${recipe.difficulty}</p>
+                <p><strong>Prep Time:</strong> ${recipe.prepTime} minutes</p>
+                <p><strong>Cook Time:</strong> ${recipe.cookTime} minutes</p>
+                <p><strong>Total Time:</strong> ${recipe.prepTime + recipe.cookTime} minutes</p>
+                
+                <hr>
+                
+                <h3>Ingredients</h3>
+                <ul>
+            `;
+            
+            recipe.ingredients.forEach(ing => {
+                html += `<li>${ing.amount} ${ing.unit} ${ing.name}</li>`;
+            });
+            
+            html += `
+                </ul>
+                
+                <hr>
+                
+                <h3>Instructions</h3>
+                <ol>
+            `;
+            
+            recipe.instructions.forEach(step => {
+                html += `<li>${step}</li>`;
+            });
+            
+            html += `
+                </ol>
+                
+                <hr>
+                
+                <button onclick="deleteRecipe('${recipe.id}')">Delete Recipe</button>
+                <button onclick="window.location.href='index.html'">Back to Home</button>
+            `;
+            
+            document.getElementById('recipe-details').innerHTML = html;
+        }
+
+        function deleteRecipe(id) {
+            if (!confirm('Are you sure you want to delete this recipe?')) {
+                return;
+            }
+
+            let xhr = new XMLHttpRequest();
+            xhr.addEventListener("load", function() {
+                alert('Recipe deleted successfully!');
+                window.location.href = 'index.html';
+            });
+            xhr.open("DELETE", API_URL + "/recipes/" + id);
+            xhr.send();
+        }
+
+        // Load recipe when the page loads
+        window.onload = loadRecipe;
+    </script>
+</body>
+
+</html>

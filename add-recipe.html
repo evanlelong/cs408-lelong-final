@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Add Recipe - My Cookbook</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <h1>Add New Recipe</h1>
+    
+    <nav>
+        <a href="index.html">Home</a> | 
+        <a href="add-recipe.html">Add Recipe</a> | 
+        <a href="browse.html">Browse</a>
+    </nav>
+
+    <hr>
+
+    <form id="recipe-form">
+        <div>
+            <label for="name">Recipe Name:</label><br>
+            <input type="text" id="name" required style="width: 300px;">
+        </div>
+        <br>
+        
+        <div>
+            <label for="description">Description:</label><br>
+            <textarea id="description" required style="width: 300px; height: 80px;"></textarea>
+        </div>
+        <br>
+        
+        <div>
+            <label for="category">Category:</label><br>
+            <select id="category" required>
+                <option value="">-- Select Category --</option>
+                <option value="breakfast">Breakfast</option>
+                <option value="lunch">Lunch</option>
+                <option value="dinner">Dinner</option>
+                <option value="dessert">Dessert</option>
+                <option value="snack">Snack</option>
+                <option value="appetizer">Appetizer</option>
+            </select>
+        </div>
+        <br>
+        
+        <div>
+            <label for="difficulty">Difficulty:</label><br>
+            <select id="difficulty" required>
+                <option value="">-- Select Difficulty --</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+        </div>
+        <br>
+        
+        <div>
+            <label for="prepTime">Prep Time (minutes):</label><br>
+            <input type="number" id="prepTime" min="0" required>
+        </div>
+        <br>
+        
+        <div>
+            <label for="cookTime">Cook Time (minutes):</label><br>
+            <input type="number" id="cookTime" min="0" required>
+        </div>
+        <br>
+        
+        <div>
+            <label>Ingredients:</label><br>
+            <div id="ingredients-list">
+                <div>
+                    <input type="text" placeholder="Amount" style="width: 60px;">
+                    <input type="text" placeholder="Unit" style="width: 60px;">
+                    <input type="text" placeholder="Ingredient name" style="width: 150px;">
+                </div>
+            </div>
+            <button type="button" onclick="addIngredientField()">+ Add Ingredient</button>
+        </div>
+        <br>
+        
+        <div>
+            <label>Instructions:</label><br>
+            <div id="instructions-list">
+                <div>
+                    <textarea placeholder="Step 1" style="width: 300px; height: 60px;"></textarea>
+                </div>
+            </div>
+            <button type="button" onclick="addInstructionField()">+ Add Step</button>
+        </div>
+        <br>
+        
+        <button type="submit">Save Recipe</button>
+        <button type="button" onclick="window.location.href='index.html'">Cancel</button>
+    </form>
+
+    <script>
+        const API_URL = "https://51ymz2ea4c.execute-api.us-east-2.amazonaws.com";
+
+        function addIngredientField() {
+            const container = document.getElementById('ingredients-list');
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <input type="text" placeholder="Amount" style="width: 60px;">
+                <input type="text" placeholder="Unit" style="width: 60px;">
+                <input type="text" placeholder="Ingredient name" style="width: 150px;">
+            `;
+            container.appendChild(div);
+        }
+
+        function addInstructionField() {
+            const container = document.getElementById('instructions-list');
+            const count = container.children.length + 1;
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <textarea placeholder="Step ${count}" style="width: 300px; height: 60px;"></textarea>
+            `;
+            container.appendChild(div);
+        }
+
+        document.getElementById('recipe-form').onsubmit = function(e) {
+            e.preventDefault();
+            
+            // Gather ingredients
+            const ingredientDivs = document.getElementById('ingredients-list').children;
+            const ingredients = [];
+            for (let div of ingredientDivs) {
+                const inputs = div.querySelectorAll('input');
+                if (inputs[2].value.trim()) {
+                    ingredients.push({
+                        amount: inputs[0].value,
+                        unit: inputs[1].value,
+                        name: inputs[2].value
+                    });
+                }
+            }
+            
+            // Gather instructions
+            const instructionDivs = document.getElementById('instructions-list').children;
+            const instructions = [];
+            for (let div of instructionDivs) {
+                const textarea = div.querySelector('textarea');
+                if (textarea.value.trim()) {
+                    instructions.push(textarea.value);
+                }
+            }
+            
+            const recipe = {
+                name: document.getElementById('name').value,
+                description: document.getElementById('description').value,
+                category: document.getElementById('category').value,
+                difficulty: document.getElementById('difficulty').value,
+                prepTime: parseInt(document.getElementById('prepTime').value),
+                cookTime: parseInt(document.getElementById('cookTime').value),
+                ingredients: ingredients,
+                instructions: instructions
+            };
+
+            let xhr = new XMLHttpRequest();
+            xhr.addEventListener("load", function() {
+                alert('Recipe added successfully!');
+                window.location.href = 'index.html';
+            });
+            xhr.open("POST", API_URL + "/recipes");
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(JSON.stringify(recipe));
+        }
+    </script>
+</body>
+
+</html>
