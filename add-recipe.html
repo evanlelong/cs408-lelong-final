@@ -125,7 +125,7 @@
         document.getElementById('recipe-form').onsubmit = function(e) {
             e.preventDefault();
             
-            // Gather ingredients
+            //ingredients
             const ingredientDivs = document.getElementById('ingredients-list').children;
             const ingredients = [];
             for (let div of ingredientDivs) {
@@ -139,7 +139,7 @@
                 }
             }
             
-            // Gather instructions
+            //instructions
             const instructionDivs = document.getElementById('instructions-list').children;
             const instructions = [];
             for (let div of instructionDivs) {
