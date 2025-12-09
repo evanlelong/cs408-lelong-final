@@ -7,21 +7,21 @@
     <title>Recipe Details - My Cookbook</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
-    <h1>Recipe Details</h1>
-    
-    <nav>
-        <a href="index.html">Home</a> | 
-        <a href="add-recipe.html">Add Recipe</a> | 
-        <a href="browse.html">Browse</a>
-    </nav>
-
-    <hr>
-
-    <div id="recipe-details">
+    <div class="container">
+        <h1>Recipe Details</h1>
         
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="add-recipe.html">Add Recipe</a>
+            <a href="browse.html">Browse</a>
+        </nav>
+
+        <div id="recipe-details" class="form-container">
+        </div>
     </div>
 
     <script>
@@ -50,11 +50,16 @@
         }
 
         function displayRecipe(recipe) {
+            const difficultyClass = `badge badge-${recipe.difficulty}`;
             let html = `
                 <h2>${recipe.name}</h2>
                 <p>${recipe.description}</p>
-                <p><strong>Category:</strong> ${recipe.category}</p>
-                <p><strong>Difficulty:</strong> ${recipe.difficulty}</p>
+                
+                <div class="recipe-meta">
+                    <span class="${difficultyClass}">${recipe.difficulty.toUpperCase()}</span>
+                    <span class="badge">${recipe.category}</span>
+                </div>
+                
                 <p><strong>Prep Time:</strong> ${recipe.prepTime} minutes</p>
                 <p><strong>Cook Time:</strong> ${recipe.cookTime} minutes</p>
                 <p><strong>Total Time:</strong> ${recipe.prepTime + recipe.cookTime} minutes</p>
@@ -87,8 +92,8 @@
                 
                 <hr>
                 
-                <button onclick="deleteRecipe('${recipe.id}')">Delete Recipe</button>
-                <button onclick="window.location.href='index.html'">Back to Home</button>
+                <button class="delete-btn" onclick="deleteRecipe('${recipe.id}')">Delete Recipe</button>
+                <button class="cancel-btn" onclick="window.location.href='index.html'">Back to Home</button>
             `;
             
             document.getElementById('recipe-details').innerHTML = html;
@@ -108,7 +113,6 @@
             xhr.send();
         }
 
-        // Load recipe
         window.onload = loadRecipe;
     </script>
 </body>

@@ -7,54 +7,50 @@
     <title>Browse Recipes - My Cookbook</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
-    <h1>Browse Recipes</h1>
-    
-    <nav>
-        <a href="index.html">Home</a> | 
-        <a href="add-recipe.html">Add Recipe</a> | 
-        <a href="browse.html">Browse</a>
-    </nav>
-
-    <hr>
-
-    <div>
-        <h2>Filter Recipes</h2>
+    <div class="container">
+        <h1>Browse Recipes</h1>
         
-        <label>Category:</label><br>
-        <select id="filter-category">
-            <option value="">All</option>
-            <option value="breakfast">Breakfast</option>
-            <option value="lunch">Lunch</option>
-            <option value="dinner">Dinner</option>
-            <option value="dessert">Dessert</option>
-            <option value="snack">Snack</option>
-            <option value="appetizer">Appetizer</option>
-        </select>
-        <br><br>
-        
-        <label>Difficulty:</label><br>
-        <select id="filter-difficulty">
-            <option value="">All</option>
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-        </select>
-        <br><br>
-        
-        <label>Max Cook Time (minutes):</label><br>
-        <input type="number" id="filter-cooktime" min="0" placeholder="e.g., 30">
-        <br><br>
-        
-        <button onclick="applyFilters()">Apply Filters</button>
-        <button onclick="clearFilters()">Clear Filters</button>
-    </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="add-recipe.html">Add Recipe</a>
+            <a href="browse.html">Browse</a>
+        </nav>
 
-    <hr>
+        <div class="filter-section">
+            <h2>Filter Recipes</h2>
+            
+            <label>Category:</label>
+            <select id="filter-category">
+                <option value="">All Categories</option>
+                <option value="breakfast">Breakfast</option>
+                <option value="lunch">Lunch</option>
+                <option value="dinner">Dinner</option>
+                <option value="dessert">Dessert</option>
+                <option value="snack">Snack</option>
+                <option value="appetizer">Appetizer</option>
+            </select>
+            
+            <label>Difficulty:</label>
+            <select id="filter-difficulty">
+                <option value="">All Difficulties</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+            
+            <label>Max Cook Time (minutes):</label>
+            <input type="number" id="filter-cooktime" min="0" placeholder="e.g., 30">
+            
+            <button onclick="applyFilters()">Apply Filters</button>
+            <button onclick="clearFilters()">Clear Filters</button>
+        </div>
 
-    <div id="filtered-recipes">
+        <div id="filtered-recipes">
+        </div>
     </div>
 
     <script>
@@ -102,20 +98,26 @@
             const container = document.getElementById('filtered-recipes');
             
             if (!recipes || recipes.length === 0) {
-                container.innerHTML = '<p>No recipes found matching your filters.</p>';
+                container.innerHTML = '<div class="error">No recipes found matching your filters.</div>';
                 return;
             }
             
-            let html = `<p><strong>Found ${count} recipe(s)</strong></p>`;
+            let html = `<div class="success">Found ${count} recipe(s)</div>`;
             
             recipes.forEach(recipe => {
+                const difficultyClass = `badge badge-${recipe.difficulty}`;
                 html += `
-                    <div style="border: 1px solid #ccc; padding: 15px; margin: 10px 0;">
+                    <div class="recipe-card">
                         <h3>${recipe.name}</h3>
                         <p>${recipe.description}</p>
-                        <p><strong>Category:</strong> ${recipe.category} | <strong>Difficulty:</strong> ${recipe.difficulty}</p>
-                        <p><strong>Prep Time:</strong> ${recipe.prepTime} min | <strong>Cook Time:</strong> ${recipe.cookTime} min</p>
-                        <a href="recipe-detail.html?id=${recipe.id}">View Details</a>
+                        <div class="recipe-meta">
+                            <span class="${difficultyClass}">${recipe.difficulty.toUpperCase()}</span>
+                            <span class="badge">${recipe.category}</span>
+                            <br>
+                            <strong>Prep:</strong> ${recipe.prepTime} min | 
+                            <strong>Cook:</strong> ${recipe.cookTime} min
+                        </div>
+                        <a href="recipe-detail.html?id=${recipe.id}">View Details →</a>
                     </div>
                 `;
             });
@@ -130,7 +132,6 @@
             loadAllRecipes();
         }
 
-        // Load all recipes when the page loads
         window.onload = loadAllRecipes;
     </script>
 </body>

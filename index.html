@@ -7,30 +7,28 @@
     <title>My Cookbook</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
-    <h1>My Cookbook</h1>
-    
-    <nav>
-        <a href="index.html">Home</a> | 
-        <a href="add-recipe.html">Add Recipe</a> | 
-        <a href="browse.html">Browse</a>
-    </nav>
-
-    <hr>
-
-    <div>
-        <h2>All Recipes</h2>
-        <input type="text" id="search-input" placeholder="Search recipes...">
-        <button onclick="searchRecipes()">Search</button>
-        <button onclick="loadRecipes()">Show All</button>
-    </div>
-
-    <hr>
-
-    <div id="recipes-list">
+    <div class="container">
+        <h1>My Cookbook</h1>
         
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="add-recipe.html">Add Recipe</a>
+            <a href="browse.html">Browse</a>
+        </nav>
+
+        <div class="filter-section">
+            <h2>Search Recipes</h2>
+            <input type="text" id="search-input" placeholder="Search recipes...">
+            <button onclick="searchRecipes()">Search</button>
+            <button onclick="loadRecipes()">Show All</button>
+        </div>
+
+        <div id="recipes-list">
+        </div>
     </div>
 
     <script>
@@ -56,13 +54,20 @@
             
             let html = '';
             recipes.forEach(recipe => {
+                const difficultyClass = `badge badge-${recipe.difficulty}`;
                 html += `
-                    <div style="border: 1px solid #ccc; padding: 15px; margin: 10px 0;">
+                    <div class="recipe-card">
                         <h3>${recipe.name}</h3>
                         <p>${recipe.description}</p>
-                        <p><strong>Category:</strong> ${recipe.category} | <strong>Difficulty:</strong> ${recipe.difficulty}</p>
-                        <p><strong>Prep Time:</strong> ${recipe.prepTime} min | <strong>Cook Time:</strong> ${recipe.cookTime} min</p>
-                        <a href="recipe-detail.html?id=${recipe.id}">View Details</a>
+                        <div class="recipe-meta">
+                            <span class="${difficultyClass}">${recipe.difficulty.toUpperCase()}</span>
+                            <span class="badge">${recipe.category}</span>
+                            <br>
+                            <strong>Prep:</strong> ${recipe.prepTime} min | 
+                            <strong>Cook:</strong> ${recipe.cookTime} min | 
+                            <strong>Total:</strong> ${recipe.prepTime + recipe.cookTime} min
+                        </div>
+                        <a href="recipe-detail.html?id=${recipe.id}">View Details →</a>
                     </div>
                 `;
             });
@@ -87,7 +92,6 @@
             xhr.send();
         }
 
-        // Load recipes
         window.onload = loadRecipes;
     </script>
 </body>
